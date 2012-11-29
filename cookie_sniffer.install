@@ -1,0 +1,21 @@
+<?php
+
+  function cookie_sniffer_schema() {
+    return array(
+      'tasty_cookies' => array(
+        'fields' => array(
+          'cookie_name' => array(
+            'type' => 'varchar',
+            'length' => 128,
+            'not null' => TRUE,
+          ),
+          'cookie_count' => array(
+            'type' => 'int',
+            'size' => 'big',
+            'default' => 0,
+          ),
+        ),
+        'primary key' => array('cookie_name'),
+      ),
+    );
+  }

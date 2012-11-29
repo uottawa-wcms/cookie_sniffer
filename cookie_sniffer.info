@@ -1,0 +1,8 @@
+name = Cookie Sniffer
+description = "Looks for incoming cookies from anonymous users and logs them, with a report."
+core = 7.x
+package = Development
+
+files[] = cookie_sniffer.module
+
+version = "7.x-1.0-beta1"

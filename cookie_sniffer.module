@@ -1,0 +1,53 @@
+<?php
+
+function cookie_sniffer_init() {
+  $cookies = array();
+  $rs = db_query('SELECT cookie_name FROM {tasty_cookies}');
+  foreach ($rs as $row) {
+    $cookies[] = $row->cookie_name;
+  }
+  if (!user_is_logged_in()) {
+    foreach (array_keys($_COOKIE) as $cookie_name) {
+      if (!in_array($cookie_name, $cookies)) {
+        try {
+          db_insert('tasty_cookies')
+          ->fields(array(
+            'cookie_name' => $cookie_name
+          ))
+          ->execute();
+        } catch (Exception $e) {}
+      }
+      db_update('tasty_cookies')
+      ->expression('cookie_count', 'cookie_count + 1')
+      ->condition('cookie_name', $cookie_name)
+      ->execute();
+    }
+  }
+}
+
+function cookie_sniffer_menu() {
+  return array(
+    'admin/reports/cookies' => array(
+      'title' => 'Top anonymous cookies',
+      'description' => 'View cookies being sent by anonymous users.',
+      'access arguments' => array('access admin pages'),
+      'page callback' => 'cookie_sniffer_list_all',
+    )
+  );
+}
+
+function cookie_sniffer_list_all() {
+  $headers = array(
+    'cookie_name' => 'Cookie Name',
+    'cookie_count' => 'Total',
+  );
+  $rows = array();
+  $rs = db_query('SELECT * FROM {tasty_cookies} ORDER BY cookie_count DESC');
+  foreach ($rs as $row) {
+    $rows[] = (array) $row;
+  }
+  return theme('table', array(
+    'header' => $headers,
+    'rows' => $rows,
+  ));
+}
